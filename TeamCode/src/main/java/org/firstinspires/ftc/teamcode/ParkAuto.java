@@ -71,23 +71,23 @@ public class ParkAuto extends LinearOpMode {
         }
 
         if (id != 2) {
-            runToPosition(-30.0, -30.0,0.3);
+            runToPosition(30.0, 30.0,0.3);
 
             runToPosition(-20.0, 20.0,0.3);
 
             if (id == 1) {
-                runToPosition(-26.0, -26.0, 0.3);
+                runToPosition(26.0, 26.0, 0.3);
             }
 
             if (id == 3) {
-                runToPosition(24.0, 24.0, 0.3);
+                runToPosition(-24.0, -24.0, 0.3);
             }
 
-            runToPosition(-20.0, 20.0,0.3);
+            runToPosition(20.0, -20.0,0.3);
             runToPosition(5.0, 5.0, 0.3);
         }
         else {
-            runToPosition(-36, -36,0.3);
+            runToPosition(36, 36,0.3);
         }
     }
 
