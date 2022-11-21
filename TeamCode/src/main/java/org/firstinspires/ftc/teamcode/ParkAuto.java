@@ -33,6 +33,9 @@ public class ParkAuto extends LinearOpMode {
         motorFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         motorBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        DcMotorEx lift = hardwareMap.get(DcMotorEx.class, "liftMotor");
+        lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         OpenCvWebcam camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
