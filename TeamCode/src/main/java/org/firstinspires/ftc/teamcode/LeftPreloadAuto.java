@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.vision.AprilTagDetectionPipeline;
@@ -17,7 +18,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.ArrayList;
 
 @Autonomous
-public class ParkAuto extends LinearOpMode {
+public class LeftPreloadAuto extends LinearOpMode {
     private DcMotorEx motorFrontLeft;
     private DcMotorEx motorBackLeft;
     private DcMotorEx motorFrontRight;
@@ -35,6 +36,8 @@ public class ParkAuto extends LinearOpMode {
 
         DcMotorEx lift = hardwareMap.get(DcMotorEx.class, "liftMotor");
         lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        Servo claw = hardwareMap.get(Servo.class, "clawServo");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         OpenCvWebcam camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
@@ -73,24 +76,40 @@ public class ParkAuto extends LinearOpMode {
             telemetry.update();
         }
 
-        if (id != 2) {
-            runToPosition(30.0, 30.0,0.3);
+        claw.setPosition(0.1);
 
-            runToPosition(-20.0, 20.0,0.3);
+        sleep(500);
 
-            if (id == 1) {
-                runToPosition(26.0, 26.0, 0.3);
-            }
+        lift.setTargetPosition(-300);
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift.setPower(0.5);
 
-            if (id == 3) {
-                runToPosition(-24.0, -24.0, 0.3);
-            }
+        while (lift.isBusy()) {}
 
-            runToPosition(20.0, -20.0,0.3);
-            runToPosition(5.0, 5.0, 0.3);
+        runToPosition(61, 61, 0.3);
+
+        lift.setTargetPosition(-4000);
+        runToPosition(10, -10, 0.3);
+        runToPosition(6, 6, 0.3);
+        while (lift.isBusy()) {}
+
+        lift.setTargetPosition(-3600);
+        while (lift.isBusy()) {}
+        claw.setPosition(0.2);
+
+        sleep(1000);
+        runToPosition(-8, -8, 0.3);
+
+        claw.setPosition(0.1);
+        lift.setTargetPosition(-300);
+
+        runToPosition(10, -10, 0.3);
+
+        if (id == 1) {
+            runToPosition(-24, -24, 0.3);
         }
-        else {
-            runToPosition(36, 36,0.3);
+        else if (id == 3) {
+            runToPosition(24, 24, 0.3);
         }
     }
 
