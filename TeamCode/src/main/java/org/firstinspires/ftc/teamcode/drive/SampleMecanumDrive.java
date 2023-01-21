@@ -21,6 +21,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -54,8 +55,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 2);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -99,10 +100,32 @@ public class SampleMecanumDrive extends MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         imu.initialize(parameters);
 
-        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
-        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
-        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        // TODO: If the hub containing the IMU you are using is mounted so that the "REV" logo does
+        // not face up, remap the IMU axes so that the z-axis points upward (normal to the floor.)
+        //
+        //             | +Z axis
+        //             |
+        //             |
+        //             |
+        //      _______|_____________     +Y axis
+        //     /       |_____________/|__________
+        //    /   REV / EXPANSION   //
+        //   /       / HUB         //
+        //  /_______/_____________//
+        // |_______/_____________|/
+        //        /
+        //       / +X axis
+        //
+        // This diagram is derived from the axes in section 3.4 https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bno055-ds000.pdf
+        // and the placement of the dot/orientation from https://docs.revrobotics.com/rev-control-system/control-system-overview/dimensions#imu-location
+        //
+        // For example, if +Y in this diagram faces downwards, you would use AxisDirection.NEG_Y.
+        // BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_Y);
+
+        leftFront = hardwareMap.get(DcMotorEx.class, "frontLeft");
+        leftRear = hardwareMap.get(DcMotorEx.class, "backLeft");
+        rightRear = hardwareMap.get(DcMotorEx.class, "backRight");
+        rightFront = hardwareMap.get(DcMotorEx.class, "frontRight");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -123,6 +146,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: reverse any motors using DcMotor.setDirection()
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: if desired, use setLocalizer() to change the localization method
         // for instance, setLocalizer(new ThreeTrackingWheelLocalizer(...));
