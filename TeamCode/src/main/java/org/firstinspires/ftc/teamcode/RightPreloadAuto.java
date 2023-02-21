@@ -86,11 +86,11 @@ public class RightPreloadAuto extends LinearOpMode {
 
         while (lift.isBusy()) {}
 
-        runToPosition(61, 61, 0.3);
+        runToPosition(58, 58, 0.3);
 
-        lift.setTargetPosition(-4000);
+        lift.setTargetPosition(-4400);
         runToPosition(-10, 10, 0.3);
-        runToPosition(6, 6, 0.3);
+        runToPosition(9, 9, 0.3);
         while (lift.isBusy()) {}
 
         lift.setTargetPosition(-3600);
@@ -98,18 +98,18 @@ public class RightPreloadAuto extends LinearOpMode {
         claw.setPosition(0.2);
 
         sleep(1000);
-        runToPosition(-8, -8, 0.3);
+        runToPosition(-10, -10, 0.3);
 
         claw.setPosition(0.1);
-        lift.setTargetPosition(-300);
+        lift.setTargetPosition(-500);
 
         runToPosition(-10, 10, 0.3);
 
         if (id == 1) {
-            runToPosition(24, 24, 0.3);
+            runToPosition(26, 26, 0.3);
         }
         else if (id == 3) {
-            runToPosition(-24, -24, 0.3);
+            runToPosition(-28, -28, 0.3);
         }
     }
 
