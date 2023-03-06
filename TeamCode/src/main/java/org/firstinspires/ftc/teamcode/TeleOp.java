@@ -31,7 +31,7 @@ public class TeleOp extends OpModeTemplate {
 
         new Trigger(
                 () -> Math.abs(gamepad1.right_trigger - gamepad1.left_trigger) > 0.05
-        ).whileActiveContinuous(
+        ).whileActiveOnce(
                 superstructure.manualPower(() -> gamepad1.right_trigger - gamepad1.left_trigger));
     }
 
@@ -39,10 +39,12 @@ public class TeleOp extends OpModeTemplate {
     public void run() {
         super.run();
 
-        drive.setDrivePower(new Pose2d(
+        Pose2d drivePower = new Pose2d(
                 -gamepad1.left_stick_y,
                 gamepad1.left_stick_x,
-                gamepad1.right_stick_x));
+                gamepad1.right_stick_x);
+        drive.setDrivePower(drivePower);
+        superstructure.hasClearance = drivePower.vec().norm() > 0.1;
 
         superstructure.manualClawOpen = gamepad2.right_bumper;
     }

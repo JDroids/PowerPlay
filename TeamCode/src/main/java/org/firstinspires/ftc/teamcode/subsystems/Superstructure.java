@@ -51,6 +51,7 @@ public class Superstructure implements Subsystem {
     public enum States {
         INTAKING,
         KNOCKED_OVER_INTAKING,
+        DEPOSIT_HEIGHT,
         DEPOSITING,
         WAITING_FOR_CLEARANCE
     }
@@ -60,7 +61,7 @@ public class Superstructure implements Subsystem {
 
     private States state = States.INTAKING;
 
-    private BooleanSupplier hasClearance = () -> false;
+    public boolean hasClearance = false;
 
     public boolean manualClawOpen = false;
 
@@ -88,7 +89,7 @@ public class Superstructure implements Subsystem {
 
     public void depositAtHeight(double height) {
         controller.setTargetPosition(height);
-        state = States.DEPOSITING;
+        state = States.DEPOSIT_HEIGHT;
     }
 
     public void changeOffset(double amount) {
@@ -97,22 +98,28 @@ public class Superstructure implements Subsystem {
 
     public void increaseIntakeHeight() {
         if (state != States.INTAKING) {
-            state = States.INTAKING;
-            intakeHeight = 5;
-            return;
+            setIntakeHeight(0);
         }
-
-        intakeHeight = (intakeHeight + 1) % 5;
+        else {
+            setIntakeHeight((intakeHeight + 1) % 5);
+        }
     }
 
     public void decreaseIntakeHeight() {
         if (state != States.INTAKING) {
-            state = States.INTAKING;
-            intakeHeight = 0;
-            return;
+            setIntakeHeight(0);
         }
+        else {
+            setIntakeHeight((intakeHeight - 1) % 5);
+        }
+    }
 
-        intakeHeight = (intakeHeight - 1) % 5;
+    private void setIntakeHeight(int height) {
+        intakeHeight = height;
+        controller.reset();
+        controller.setTargetPosition(intakeHeightLevel0 + intakeHeight * coneHeight);
+
+        state = States.INTAKING;
     }
 
     public void deposit() {
@@ -150,20 +157,24 @@ public class Superstructure implements Subsystem {
             case KNOCKED_OVER_INTAKING:
                 wrist.setPosition(wristKnockedOverPos);
                 break;
-            case DEPOSITING:
+            case DEPOSIT_HEIGHT:
                 wrist.setPosition(wristDepositingPos);
                 break;
-            case WAITING_FOR_CLEARANCE:
+            case DEPOSITING:
                 wrist.setPosition(wristDepositingPos);
 
                 if (!isBusy()) {
                     clawPos = clawOpenPos;
-
-                    if (hasClearance.getAsBoolean()) {
-                        controller.reset();
-                        decreaseIntakeHeight(); // reset to intake height 0
-                    }
+                    state = States.WAITING_FOR_CLEARANCE;
                 }
+                break;
+            case WAITING_FOR_CLEARANCE:
+                clawPos = clawOpenPos;
+
+                if (hasClearance) {
+                    setIntakeHeight(0);
+                }
+
                 break;
         }
 
