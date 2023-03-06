@@ -26,13 +26,13 @@ public class TeleOp extends OpModeTemplate {
 
         new Trigger(() -> gamepad2.left_bumper).whenActive(superstructure::intakeKnockedOver);
 
-        new Trigger(() -> gamepad1.dpad_left).whenActive(() -> superstructure.changeOffset(-0.2));
-        new Trigger(() -> gamepad1.dpad_left).whenActive(() -> superstructure.changeOffset(0.2));
+        new Trigger(() -> gamepad2.dpad_left).whenActive(() -> superstructure.changeOffset(-0.2));
+        new Trigger(() -> gamepad2.dpad_left).whenActive(() -> superstructure.changeOffset(0.2));
 
         new Trigger(
-                () -> Math.abs(gamepad1.right_trigger - gamepad1.left_trigger) > 0.05
+                () -> Math.abs(gamepad2.right_trigger - gamepad2.left_trigger) > 0.05
         ).whileActiveOnce(
-                superstructure.manualPower(() -> gamepad1.right_trigger - gamepad1.left_trigger));
+                superstructure.manualPower(() -> gamepad2.right_trigger - gamepad2.left_trigger));
     }
 
     @Override
