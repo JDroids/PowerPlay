@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -18,7 +18,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.ArrayList;
 
 @Autonomous
-public class RightPreloadAuto extends LinearOpMode {
+public class LeftPreloadAuto extends LinearOpMode {
     private DcMotorEx motorFrontLeft;
     private DcMotorEx motorBackLeft;
     private DcMotorEx motorFrontRight;
@@ -86,10 +86,10 @@ public class RightPreloadAuto extends LinearOpMode {
 
         while (lift.isBusy()) {}
 
-        runToPosition(58, 58, 0.3);
+        runToPosition(59, 59, 0.3);
 
         lift.setTargetPosition(-4400);
-        runToPosition(-10, 10, 0.3);
+        runToPosition(10, -10, 0.3);
         runToPosition(9, 9, 0.3);
         while (lift.isBusy()) {}
 
@@ -103,13 +103,13 @@ public class RightPreloadAuto extends LinearOpMode {
         claw.setPosition(0.1);
         lift.setTargetPosition(-500);
 
-        runToPosition(-10, 10, 0.3);
+        runToPosition(10, -10, 0.3);
 
         if (id == 1) {
-            runToPosition(26, 26, 0.3);
+            runToPosition(-28, -28, 0.3);
         }
         else if (id == 3) {
-            runToPosition(-28, -28, 0.3);
+            runToPosition(26, 26, 0.3);
         }
     }
 
