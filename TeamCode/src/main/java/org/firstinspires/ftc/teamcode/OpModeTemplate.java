@@ -5,10 +5,10 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.FunctionalCommand;
+import com.qualcomm.hardware.lynx.LynxModule;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.subsystems.Updater;
 import org.firstinspires.ftc.teamcode.subsystems.Superstructure;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.vision.AprilTagDetectionPipeline;
@@ -17,17 +17,33 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.util.List;
+
 abstract public class OpModeTemplate extends CommandOpMode {
     protected SampleMecanumDrive drive;
-    private Updater updater;
     protected Superstructure superstructure;
-
+    List<LynxModule> hubs;
     protected void initHardware(boolean isAuto) {
         drive = new SampleMecanumDrive(hardwareMap);
-        updater = new Updater(hardwareMap, drive);
         superstructure = new Superstructure(hardwareMap, isAuto);
 
-        register(updater, superstructure);
+        hubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : hubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
+
+        register(superstructure);
+    }
+
+    @Override
+    public void run() {
+        for (LynxModule hub : hubs) {
+            hub.clearBulkCache();
+        }
+
+        drive.update();
+
+        super.run();
     }
 
     protected AprilTagDetectionPipeline createAprilTagPipeline() {
@@ -55,7 +71,7 @@ abstract public class OpModeTemplate extends CommandOpMode {
     protected Command followTrajectorySequence(TrajectorySequence trajectorySequence) {
         return new FunctionalCommand(
                 () -> drive.followTrajectorySequenceAsync(trajectorySequence),
-                () -> { },
+                () -> {},
                 (interrupted) -> {},
                 () -> !drive.isBusy());
     }
