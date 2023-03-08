@@ -1,17 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.control.PIDFController;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.FunctionalCommand;
 import com.arcrobotics.ftclib.command.Subsystem;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 @Config
@@ -21,23 +22,21 @@ public class Superstructure implements Subsystem {
     private Servo wrist;
     private Servo claw;
 
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.0, 0.0, 0.0);
-    public static double kG = 0.0;
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.2, 0.0, 0.01);
+    public static double kG = 0.15;
 
     private static PIDFController controller
             = new PIDFController(pidCoefficients, 0.0, 0.0, 0.0, (v, a) -> kG);
 
-    public static double clawOpenPos = 0.0;
-    public static double clawClosedPos = 0.0;
+    public static double clawOpenPos = 1.0;
+    public static double clawClosedPos = 0.6;
 
-    public static double wristIntakePos = 0.0;
-    public static double wristKnockedOverPos = 0.0;
-    public static double wristDepositingPos = 0.0;
+    public static double wristIntakePos = 0.75;
+    public static double wristKnockedOverPos = 0.3;
+    public static double wristDepositingPos = 1.0;
 
-    public static double heightOffset = 2.0;
-
-    public static double intakeHeightLevel0 = 3.0;
-    public static double coneHeight = 1.326;
+    public static double heightOffset = 1.0;
+    public static double[] coneIntakeHeights = new double[] {1, 4.3, 5.6, 6.6, 7.8};
     public static double intakeHeightKnockedOver = 5.0;
 
     private static int intakeHeight = 0;
@@ -71,9 +70,10 @@ public class Superstructure implements Subsystem {
         wrist = hardwareMap.get(Servo.class, "wristServo");
         claw = hardwareMap.get(Servo.class, "clawServo");
 
-        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
         if (isAuto) {
+            rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
             wrist.setPosition(wristIntakePos);
             claw.setPosition(clawClosedPos);
             controller.reset();
@@ -101,7 +101,7 @@ public class Superstructure implements Subsystem {
             setIntakeHeight(0);
         }
         else {
-            setIntakeHeight((intakeHeight + 1) % 5);
+            setIntakeHeight(intakeHeight + 1);
         }
     }
 
@@ -110,14 +110,14 @@ public class Superstructure implements Subsystem {
             setIntakeHeight(0);
         }
         else {
-            setIntakeHeight((intakeHeight - 1) % 5);
+            setIntakeHeight(intakeHeight - 1);
         }
     }
 
     private void setIntakeHeight(int height) {
-        intakeHeight = height;
+        intakeHeight = Math.abs(height % coneIntakeHeights.length); // -1 % 5 = -1 in java
         controller.reset();
-        controller.setTargetPosition(intakeHeightLevel0 + intakeHeight * coneHeight);
+        controller.setTargetPosition(coneIntakeHeights[intakeHeight]);
 
         state = States.INTAKING;
     }
@@ -182,17 +182,23 @@ public class Superstructure implements Subsystem {
 
         leftMotor.setPower(power);
         rightMotor.setPower(power);
+
+        FtcDashboard.getInstance().getTelemetry().addData("Setpoint", controller.getTargetPosition());
+        FtcDashboard.getInstance().getTelemetry().addData("Current", getCurrentPosition());
+
+        FtcDashboard.getInstance().getTelemetry().addData("Power", power);
+        FtcDashboard.getInstance().getTelemetry().update();
     }
 
     private double radius = 38 / 25.4 / 2;
-    private double gearRatio = 13.7;
+    private double gearRatio = 5.2;
 
     private boolean isBusy() {
         return Math.abs(getCurrentPosition() - controller.getTargetPosition()) < 0.2;
     }
 
     private double getCurrentPosition() {
-        return ticksToInches(leftMotor.getCurrentPosition()) - heightOffset;
+        return ticksToInches(leftMotor.getCurrentPosition()) + heightOffset;
     }
 
     private double ticksToInches(int ticks) {
