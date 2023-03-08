@@ -77,11 +77,15 @@ abstract public class OpModeTemplate extends CommandOpMode {
     }
     
     // utility aliases 
-    protected Pose2d pose(Vector2d vec, double degrees) {
-        return new Pose2d(vec, Math.toRadians(degrees));
+    protected Pose2d pose(Vector2d vec, double heading) {
+        return new Pose2d(vec, heading);
     }
     
     protected Vector2d vec(double x, double y) {
         return new Vector2d(x, y);
+    }
+
+    protected double rad(double degrees) {
+        return Math.toRadians(degrees);
     }
 }
