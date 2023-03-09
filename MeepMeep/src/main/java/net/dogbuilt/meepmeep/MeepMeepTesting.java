@@ -41,29 +41,50 @@ public class MeepMeepTesting {
                     .turn(rad(-45)) // will need changes for not center
                     .forward(10)
                     .build();
-    private static AddTrajectorySequenceCallback oneCycle = drive ->
+    private static AddTrajectorySequenceCallback cycling = drive ->
             drive.trajectorySequenceBuilder(pose(vec(35.5, -63), rad(90)))
                     .forward(51.0)
-                    // cycle noe
+
+                    // drop preload
                     .turn(rad(135))
                     .forward(6)
-                    .waitSeconds(1)
                     .back(6)
                     .turn(rad(135))
+
+                    // cycle one
                     .forward(22)
-                    .waitSeconds(1)
                     .back(22)
                     .turn(rad(-135))
+                    .forward(6)
+                    .back(6)
+                    .turn(rad(135))
+
+                    // cycle two
+                    .forward(22)
+                    .back(22)
+                    .turn(rad(-135))
+                    .forward(6)
+                    .back(6)
+                    .turn(rad(135))
+
+                    // cycle three
+                    .forward(22)
+                    .back(22)
+                    .turn(rad(-135))
+                    .forward(6)
+                    .back(6)
+                    .turn(rad(135))
+
                     .build();
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
-                .setDimensions(15, 15)
+                .setDimensions(13, 15)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 30, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(oneCycle);
+                .setConstraints(80, 40, Math.toRadians(360), Math.toRadians(270), 14)
+                .followTrajectorySequence(cycling);
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
