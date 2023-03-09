@@ -22,37 +22,50 @@ public class Superstructure implements Subsystem {
     private Servo wrist;
     private Servo claw;
 
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.2, 0.0, 0.01);
-    public static double kG = 0.15;
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.1, 0.0, 0.0);
+    public static double kG = 0.05;
 
     private static PIDFController controller
             = new PIDFController(pidCoefficients, 0.0, 0.0, 0.0, (v, a) -> kG);
 
-    public static double clawOpenPos = 1.0;
-    public static double clawClosedPos = 0.6;
+    public static double clawOpenPos = 0.0;
+    public static double clawClosedPos = 0.28;
 
-    public static double wristIntakePos = 0.75;
-    public static double wristKnockedOverPos = 0.3;
-    public static double wristDepositingPos = 1.0;
+    public static double wristIntakePos = 0.58;
+    public static double wristKnockedOverPos = 0.0;
+    public static double wristDepositingPos = 0.9;
 
     public static double heightOffset = 1.0;
-    public static double[] coneIntakeHeights = new double[] {1, 4.3, 5.6, 6.6, 7.8};
-    public static double intakeHeightKnockedOver = 5.0;
+
+    public static double coneIntakeHeightGround = 1;
+    public static double coneIntakeHeightStack1 = 3;
+    public static double coneIntakeHeightStack2 = 4;
+    public static double coneIntakeHeightStack3 = 5.15;
+    public static double coneIntakeHeightStack4 = 6.4;
+    private static double[] coneIntakeHeights = new double[] {
+            coneIntakeHeightGround,
+            coneIntakeHeightStack1,
+            coneIntakeHeightStack2,
+            coneIntakeHeightStack3,
+            coneIntakeHeightStack4
+    };
 
     private static int intakeHeight = 0;
+    public static double intakeHeightKnockedOver = 5.0;
 
-    public static double depositLowHeight = 13.5;
-    public static double depositMidHeight = 23.5;
-    public static double depositHighHeight = 33.5;
+    public static double depositLowHeight = 10;
+    public static double depositMidHeight = 21;
+    public static double depositHighHeight = 31;
 
-    public static double depositChangeHeight = 3.0;
+    public static double depositChangeHeight = 5.0;
 
     public enum States {
         INTAKING,
         KNOCKED_OVER_INTAKING,
         DEPOSIT_HEIGHT,
         DEPOSITING,
-        WAITING_FOR_CLEARANCE
+        WAITING_FOR_CLEARANCE,
+        GOING_DOWN
     }
 
     private double manualPower = 0.0;
@@ -74,7 +87,6 @@ public class Superstructure implements Subsystem {
             rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-            wrist.setPosition(wristIntakePos);
             claw.setPosition(clawClosedPos);
             controller.reset();
             controller.setTargetPosition(0);
@@ -99,27 +111,31 @@ public class Superstructure implements Subsystem {
     public void increaseIntakeHeight() {
         if (state != States.INTAKING) {
             setIntakeHeight(0);
+            state = States.INTAKING;
         }
         else {
             setIntakeHeight(intakeHeight + 1);
+            state = States.INTAKING;
         }
     }
 
     public void decreaseIntakeHeight() {
         if (state != States.INTAKING) {
             setIntakeHeight(0);
+            state = States.INTAKING;
         }
         else {
             setIntakeHeight(intakeHeight - 1);
+            state = States.INTAKING;
         }
     }
 
     private void setIntakeHeight(int height) {
-        intakeHeight = Math.abs(height % coneIntakeHeights.length); // -1 % 5 = -1 in java
+        int levels = coneIntakeHeights.length;;
+        intakeHeight = Math.abs((height % levels + levels) % levels);
+        // -1 % 5 = -1 in java, so double mod to wrap around properly
         controller.reset();
         controller.setTargetPosition(coneIntakeHeights[intakeHeight]);
-
-        state = States.INTAKING;
     }
 
     public void deposit() {
@@ -170,19 +186,32 @@ public class Superstructure implements Subsystem {
                 break;
             case WAITING_FOR_CLEARANCE:
                 clawPos = clawOpenPos;
+                wrist.setPosition(wristIntakePos);
 
                 if (hasClearance) {
                     setIntakeHeight(0);
+                    state = States.GOING_DOWN;
                 }
 
+                break;
+            case GOING_DOWN:
+                clawPos = clawOpenPos;
+
+                if (!isBusy()) {
+                    state = States.INTAKING;
+                }
                 break;
         }
 
         claw.setPosition(manualClawOpen ? clawOpenPos : clawPos);
 
-        leftMotor.setPower(power);
-        rightMotor.setPower(power);
+        double clampedPower = Math.max(-0.6, power);
 
+        leftMotor.setPower(clampedPower);
+        rightMotor.setPower(clampedPower);
+
+
+        FtcDashboard.getInstance().getTelemetry().addData("State", state);
         FtcDashboard.getInstance().getTelemetry().addData("Setpoint", controller.getTargetPosition());
         FtcDashboard.getInstance().getTelemetry().addData("Current", getCurrentPosition());
 
@@ -194,7 +223,7 @@ public class Superstructure implements Subsystem {
     private double gearRatio = 5.2;
 
     private boolean isBusy() {
-        return Math.abs(getCurrentPosition() - controller.getTargetPosition()) < 0.2;
+        return Math.abs(getCurrentPosition() - controller.getTargetPosition()) > 1.0;
     }
 
     private double getCurrentPosition() {
