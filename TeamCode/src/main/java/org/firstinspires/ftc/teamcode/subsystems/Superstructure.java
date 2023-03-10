@@ -22,14 +22,15 @@ public class Superstructure implements Subsystem {
     private Servo wrist;
     private Servo claw;
 
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.1, 0.0, 0.0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.15, 0.0, 0.0);
     public static double kG = 0.05;
 
     private static PIDFController controller
             = new PIDFController(pidCoefficients, 0.0, 0.0, 0.0, (v, a) -> kG);
 
     public static double clawOpenPos = 0.0;
-    public static double clawClosedPos = 0.28;
+    public static double clawOpenKnockedOverPos = 0.1;
+    public static double clawClosedPos = 0.25;
 
     public static double wristIntakePos = 0.58;
     public static double wristKnockedOverPos = 0.0;
@@ -51,11 +52,11 @@ public class Superstructure implements Subsystem {
     };
 
     private static int intakeHeight = 0;
-    public static double intakeHeightKnockedOver = 5.0;
+    public static double intakeHeightKnockedOver = 7.0;
 
-    public static double depositLowHeight = 10;
-    public static double depositMidHeight = 21;
-    public static double depositHighHeight = 31;
+    public static double depositLowHeight = 11;
+    public static double depositMidHeight = 22;
+    public static double depositHighHeight = 32;
 
     public static double depositChangeHeight = 5.0;
 
@@ -203,7 +204,12 @@ public class Superstructure implements Subsystem {
                 break;
         }
 
-        claw.setPosition(manualClawOpen ? clawOpenPos : clawPos);
+        if (state != States.KNOCKED_OVER_INTAKING) {
+            claw.setPosition(manualClawOpen ? clawOpenPos : clawPos);
+        }
+        else {
+            claw.setPosition(manualClawOpen ? clawOpenKnockedOverPos : clawPos);
+        }
 
         double clampedPower = Math.max(-0.6, power);
 
