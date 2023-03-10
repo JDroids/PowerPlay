@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.ArrayList;
 
 @Autonomous
-public class ParkAuto extends LinearOpMode {
+public class OldParkAuto extends LinearOpMode {
     private DcMotorEx motorFrontLeft;
     private DcMotorEx motorBackLeft;
     private DcMotorEx motorFrontRight;

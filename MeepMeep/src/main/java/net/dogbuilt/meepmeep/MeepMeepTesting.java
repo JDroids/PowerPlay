@@ -38,7 +38,9 @@ public class MeepMeepTesting {
                     .forward(6)
                     .waitSeconds(2)
                     .back(6)
-                    .turn(rad(-45)) // will need changes for not center
+                    .turn(rad(45)) // will need changes depending on park location
+                    .back(23)
+                    .turn(rad(-90))
                     .forward(10)
                     .build();
     private static AddTrajectorySequenceCallback cycling = drive ->
@@ -84,7 +86,7 @@ public class MeepMeepTesting {
                 .setDimensions(13, 15)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(80, 40, Math.toRadians(360), Math.toRadians(270), 14)
-                .followTrajectorySequence(cycling);
+                .followTrajectorySequence(preload);
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)

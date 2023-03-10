@@ -61,6 +61,7 @@ public class Superstructure implements Subsystem {
     public static double depositChangeHeight = 5.0;
 
     public enum States {
+        WAITING,
         INTAKING,
         KNOCKED_OVER_INTAKING,
         DEPOSIT_HEIGHT,
@@ -88,7 +89,9 @@ public class Superstructure implements Subsystem {
             rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+            wrist.setPosition(1);
             claw.setPosition(clawClosedPos);
+
             controller.reset();
             controller.setTargetPosition(0);
         }
@@ -131,7 +134,7 @@ public class Superstructure implements Subsystem {
         }
     }
 
-    private void setIntakeHeight(int height) {
+    public void setIntakeHeight(int height) {
         int levels = coneIntakeHeights.length;;
         intakeHeight = Math.abs((height % levels + levels) % levels);
         // -1 % 5 = -1 in java, so double mod to wrap around properly
@@ -168,6 +171,8 @@ public class Superstructure implements Subsystem {
         double clawPos = clawClosedPos;
 
         switch (state) {
+            case WAITING:
+                break;
             case INTAKING:
                 wrist.setPosition(wristIntakePos);
                 break;

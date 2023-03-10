@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Trigger;
 
 import org.firstinspires.ftc.teamcode.subsystems.Superstructure;
@@ -33,6 +34,9 @@ public class TeleOp extends OpModeTemplate {
                 () -> Math.abs(gamepad2.right_trigger - gamepad2.left_trigger) > 0.05
         ).whileActiveOnce(
                 superstructure.manualPower(() -> gamepad2.right_trigger - gamepad2.left_trigger));
+
+        schedule(new InstantCommand(() -> superstructure.setIntakeHeight(0)));
+        // go to intaking position when teleop starts
     }
 
     @Override

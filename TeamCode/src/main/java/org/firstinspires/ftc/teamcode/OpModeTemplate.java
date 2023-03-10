@@ -12,17 +12,20 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.subsystems.Superstructure;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.vision.AprilTagDetectionPipeline;
+import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 abstract public class OpModeTemplate extends CommandOpMode {
     protected SampleMecanumDrive drive;
     protected Superstructure superstructure;
-    List<LynxModule> hubs;
+    private List<LynxModule> hubs;
+
     protected void initHardware(boolean isAuto) {
         drive = new SampleMecanumDrive(hardwareMap);
         superstructure = new Superstructure(hardwareMap, isAuto);
@@ -46,7 +49,7 @@ abstract public class OpModeTemplate extends CommandOpMode {
         super.run();
     }
 
-    protected AprilTagDetectionPipeline createAprilTagPipeline() {
+    protected int waitForStartAndReturnAprilTagID() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         OpenCvWebcam camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
@@ -65,7 +68,25 @@ abstract public class OpModeTemplate extends CommandOpMode {
             }
         });
 
-        return pipeline;
+        int id = 2;
+
+        while (!isStarted() && !isStopRequested()) {
+            ArrayList<AprilTagDetection> currentDetections = pipeline.getLatestDetections();
+
+            if (currentDetections.size() != 0) {
+                telemetry.addData("detected id", currentDetections.get(0).id);
+
+                id = currentDetections.get(0).id;
+            }
+            else {
+                telemetry.addData("detected id", "Nothing Found :(");
+                telemetry.addData("last detected", id);
+            }
+
+            telemetry.update();
+        }
+
+        return id;
     }
 
     protected Command followTrajectorySequence(TrajectorySequence trajectorySequence) {
