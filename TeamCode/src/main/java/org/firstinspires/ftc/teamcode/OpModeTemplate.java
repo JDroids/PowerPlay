@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.FunctionalCommand;
+import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.hardware.lynx.LynxModule;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -27,6 +28,8 @@ abstract public class OpModeTemplate extends CommandOpMode {
     private List<LynxModule> hubs;
 
     protected void initHardware(boolean isAuto) {
+        PhotonCore.enable();
+
         drive = new SampleMecanumDrive(hardwareMap);
         superstructure = new Superstructure(hardwareMap, isAuto);
 
