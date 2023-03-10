@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import static org.firstinspires.ftc.teamcode.wpilib.Commands.*;
 
 import org.firstinspires.ftc.teamcode.subsystems.Superstructure;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+@Autonomous
 public class RightPreloadAuto extends OpModeTemplate {
     @Override
     public void initialize() {
