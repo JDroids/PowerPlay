@@ -45,8 +45,8 @@ public class TeleOp extends OpModeTemplate {
 
         Pose2d drivePower = new Pose2d(
                 -gamepad1.left_stick_y,
-                gamepad1.left_stick_x,
-                gamepad1.right_stick_x);
+                -gamepad1.left_stick_x,
+                -gamepad1.right_stick_x);
         drive.setDrivePower(drivePower);
         superstructure.hasClearance = drivePower.vec().norm() > 0.1;
 

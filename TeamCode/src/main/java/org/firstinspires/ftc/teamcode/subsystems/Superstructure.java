@@ -30,13 +30,13 @@ public class Superstructure implements Subsystem {
 
     public static double clawOpenPos = 0.0;
     public static double clawOpenKnockedOverPos = 0.1;
-    public static double clawClosedPos = 0.25;
+    public static double clawClosedPos = 0.3;
 
     public static double wristIntakePos = 0.58;
     public static double wristKnockedOverPos = 0.0;
     public static double wristDepositingPos = 0.9;
 
-    public static double heightOffset = 1.0;
+    public static double heightOffset = 0.0;
 
     public static double coneIntakeHeightGround = 1;
     public static double coneIntakeHeightStack1 = 3;
@@ -51,12 +51,12 @@ public class Superstructure implements Subsystem {
             coneIntakeHeightStack4
     };
 
-    private static int intakeHeight = 0;
+    private static int intakeHeight = 2;
     public static double intakeHeightKnockedOver = 7.0;
 
-    public static double depositLowHeight = 11;
-    public static double depositMidHeight = 22;
-    public static double depositHighHeight = 32;
+    public static double depositLowHeight = 10;
+    public static double depositMidHeight = 20;
+    public static double depositHighHeight = 30;
 
     public static double depositChangeHeight = 5.0;
 
@@ -86,8 +86,8 @@ public class Superstructure implements Subsystem {
         claw = hardwareMap.get(Servo.class, "clawServo");
 
         if (isAuto) {
-            rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
             wrist.setPosition(1);
             claw.setPosition(clawClosedPos);
