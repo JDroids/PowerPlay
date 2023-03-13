@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import java.util.function.DoubleSupplier;
 
@@ -29,8 +30,8 @@ public class Superstructure implements Subsystem {
             = new PIDFController(pidCoefficients, 0.0, 0.0, 0.0, (v, a) -> kG);
 
     public static double clawOpenPos = 0.0;
-    public static double clawOpenKnockedOverPos = 0.1;
-    public static double clawClosedPos = 0.3;
+    public static double clawOpenKnockedOverPos = 0.35;
+    public static double clawClosedPos = 0.55;
 
     public static double wristIntakePos = 0.58;
     public static double wristKnockedOverPos = 0.0;
@@ -56,7 +57,7 @@ public class Superstructure implements Subsystem {
 
     public static double depositLowHeight = 10;
     public static double depositMidHeight = 20;
-    public static double depositHighHeight = 30;
+    public static double depositHighHeight = 31.5;
 
     public static double depositChangeHeight = 5.0;
 

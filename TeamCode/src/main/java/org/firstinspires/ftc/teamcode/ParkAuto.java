@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.wpilib.Commands.instant;
+import static org.firstinspires.ftc.teamcode.wpilib.Commands.sequence;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -17,9 +20,9 @@ public class ParkAuto extends OpModeTemplate {
         TrajectorySequence parkLeft =
                 drive.trajectorySequenceBuilder(initialPose)
                         .forward(28.0)
-                        .turn(rad(90))
-                        .forward(24)
                         .turn(rad(-90))
+                        .back(22)
+                        .turn(rad(90))
                         .forward(10)
                         .build();
 
@@ -42,6 +45,11 @@ public class ParkAuto extends OpModeTemplate {
         TrajectorySequence parkTrajectorySequence =
                 new TrajectorySequence[]{parkLeft, parkCenter, parkRight}[id - 1];
 
-        schedule(followTrajectorySequence(parkTrajectorySequence));
+        schedule(
+                sequence(
+                        followTrajectorySequence(parkTrajectorySequence),
+                        instant(this::requestOpModeStop)
+                )
+        );
     }
 }

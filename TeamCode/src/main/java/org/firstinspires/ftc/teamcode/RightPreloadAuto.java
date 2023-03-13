@@ -28,7 +28,7 @@ public class RightPreloadAuto extends OpModeTemplate {
                 drive.trajectorySequenceBuilder(driveToMidJunction.end())
                         .back(10)
                         .turn(rad(45))
-                        .forward(23)
+                        .forward(25)
                         .turn(rad(-90))
                         .forward(10)
                         .build();
@@ -44,7 +44,7 @@ public class RightPreloadAuto extends OpModeTemplate {
                 drive.trajectorySequenceBuilder(driveToMidJunction.end())
                         .back(6)
                         .turn(rad(45))
-                        .back(23)
+                        .back(27)
                         .turn(rad(-90))
                         .forward(10)
                         .build();
@@ -55,6 +55,7 @@ public class RightPreloadAuto extends OpModeTemplate {
                 new TrajectorySequence[]{parkLeft, parkCenter, parkRight}[id - 1];
 
         schedule(
+                waitSeconds(10),
                 sequence(
                         parallel(
                                 followTrajectorySequence(driveToMidJunction),
@@ -70,7 +71,8 @@ public class RightPreloadAuto extends OpModeTemplate {
                                         waitSeconds(2.0),
                                         instant(() -> superstructure.setIntakeHeight(0))
                                 )
-                        )
+                        ),
+                        instant(this::requestOpModeStop)
                 )
         );
     }

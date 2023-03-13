@@ -31,7 +31,7 @@ public class LeftPreloadAuto extends OpModeTemplate {
                 drive.trajectorySequenceBuilder(driveToMidJunction.end())
                         .back(10)
                         .turn(rad(-45))
-                        .back(23)
+                        .back(22)
                         .turn(rad(90))
                         .forward(10)
                         .build();
@@ -47,7 +47,7 @@ public class LeftPreloadAuto extends OpModeTemplate {
                 drive.trajectorySequenceBuilder(driveToMidJunction.end())
                         .back(10)
                         .turn(rad(-45))
-                        .forward(23)
+                        .forward(25)
                         .turn(rad(90))
                         .forward(10)
                         .build();
@@ -59,6 +59,7 @@ public class LeftPreloadAuto extends OpModeTemplate {
 
         schedule(
                 sequence(
+                        waitSeconds(10),
                         parallel(
                                 followTrajectorySequence(driveToMidJunction),
                                 instant(() -> superstructure.depositAtHeight(
@@ -73,7 +74,8 @@ public class LeftPreloadAuto extends OpModeTemplate {
                                         waitSeconds(2.0),
                                         instant(() -> superstructure.setIntakeHeight(0))
                                 )
-                        )
+                        ),
+                        instant(this::requestOpModeStop)
                 )
         );
     }
